@@ -11,13 +11,16 @@ app.use(compression());
 
 const port = process.env.PORT || 3000;
 
+// GET for all products
 app.get('/api/products', function(req, res){
+    // every GET or POST needs its own var connection due to errors caused by disconnecting server
     const connection = mysql.createConnection({
         host: 'sql.server153484.nazwa.pl',
         user: 'server153484_foodcheckapi',
         password: 'WW7aysAYy5X3ipD',
         database: 'server153484_foodCheck'
     });
+    // connects to database and query
     if(connection.connect())
         console.log('Connected with database');
     connection.query('SELECT * FROM food_products', function (error, results, fields) {
@@ -26,10 +29,12 @@ app.get('/api/products', function(req, res){
         if(results.length===0) res.status(404).send('No products in database');
         res.send(JSON.stringify(results));
     });
+    // ends the connection
     if(connection.end())
         console.log('Disconnected from database');
 });
 
+// GET for product with passed barcode
 app.get('/api/products/:barcode', function(req, res){
     const connection = mysql.createConnection({
         host: 'sql.server153484.nazwa.pl',
@@ -49,6 +54,7 @@ app.get('/api/products/:barcode', function(req, res){
         console.log('Disconnected from database');
 });
 
+// POST product to database
 app.post('/api/products', function(req, res){
     const connection = mysql.createConnection({
         host: 'sql.server153484.nazwa.pl',
@@ -91,7 +97,7 @@ app.post('/api/products', function(req, res){
     });
 });
 
-
+// listens to requests
 app.listen(port, function(){
     console.log('Listening on port '+port+'...');
 });
