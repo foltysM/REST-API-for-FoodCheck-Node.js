@@ -15,10 +15,10 @@ const port = process.env.PORT || 3000;
 app.get('/api/products', function(req, res){
     // every GET or POST needs its own var connection due to errors caused by disconnecting server
     const connection = mysql.createConnection({
-        host: 'sql.server153484.nazwa.pl',
-        user: 'server153484_foodcheckapi',
-        password: 'WW7aysAYy5X3ipD',
-        database: 'server153484_foodCheck'
+        host: '',
+        user: '',
+        password: '',
+        database: ''
     });
     // connects to database and query
     if(connection.connect())
@@ -37,10 +37,10 @@ app.get('/api/products', function(req, res){
 // GET for product with passed barcode
 app.get('/api/products/:barcode', function(req, res){
     const connection = mysql.createConnection({
-        host: 'sql.server153484.nazwa.pl',
-        user: 'server153484_foodcheckapi',
-        password: 'WW7aysAYy5X3ipD',
-        database: 'server153484_foodCheck'
+        host: '',
+        user: '',
+        password: '',
+        database: ''
     });
     if(connection.connect())
         console.log('Connected with database');
@@ -57,10 +57,10 @@ app.get('/api/products/:barcode', function(req, res){
 // POST product to database
 app.post('/api/products', function(req, res){
     const connection = mysql.createConnection({
-        host: 'sql.server153484.nazwa.pl',
-        user: 'server153484_foodcheckapi',
-        password: 'WW7aysAYy5X3ipD',
-        database: 'server153484_foodCheck'
+        host: '',
+        user: '',
+        password: '',
+        database: ''
     });
     //Validation logic
     const schema = Joi.object({
