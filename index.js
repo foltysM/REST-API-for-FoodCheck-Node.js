@@ -11,15 +11,13 @@ app.use(compression());
 
 const port = process.env.PORT || 3000;
 
-const connection = mysql.createConnection({
-    host: 'sql.server153484.nazwa.pl',
-    user: 'server153484_foodcheckapi',
-    password: 'WW7aysAYy5X3ipD',
-    database: 'server153484_foodCheck'
-});
-
-
 app.get('/api/products', function(req, res){
+    const connection = mysql.createConnection({
+        host: 'sql.server153484.nazwa.pl',
+        user: 'server153484_foodcheckapi',
+        password: 'WW7aysAYy5X3ipD',
+        database: 'server153484_foodCheck'
+    });
     if(connection.connect())
         console.log('Connected with database');
     connection.query('SELECT * FROM food_products', function (error, results, fields) {
@@ -33,6 +31,12 @@ app.get('/api/products', function(req, res){
 });
 
 app.get('/api/products/:barcode', function(req, res){
+    const connection = mysql.createConnection({
+        host: 'sql.server153484.nazwa.pl',
+        user: 'server153484_foodcheckapi',
+        password: 'WW7aysAYy5X3ipD',
+        database: 'server153484_foodCheck'
+    });
     if(connection.connect())
         console.log('Connected with database');
     connection.query('SELECT * FROM food_products WHERE barcode = '+req.params.barcode+';', function (error, results, fields) {
@@ -46,6 +50,12 @@ app.get('/api/products/:barcode', function(req, res){
 });
 
 app.post('/api/products', function(req, res){
+    const connection = mysql.createConnection({
+        host: 'sql.server153484.nazwa.pl',
+        user: 'server153484_foodcheckapi',
+        password: 'WW7aysAYy5X3ipD',
+        database: 'server153484_foodCheck'
+    });
     //Validation logic
     const schema = Joi.object({
         barcode: Joi.number().required(),
