@@ -13,10 +13,10 @@ const port = process.env.PORT || 3000;
 
 var pool = mysql.createPool({
     connectionLimit: 5, 
-    host: 'sql.server153484.nazwa.pl',
-    user: 'server153484_foodcheckapi',
-    password: 'WW7aysAYy5X3ipD',
-    database: 'server153484_foodCheck'
+    host: '',
+    user: '',
+    password: '',
+    database: ''
 })
 
 // GET for all products
