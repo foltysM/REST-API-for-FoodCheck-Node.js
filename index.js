@@ -1,8 +1,8 @@
 const Joi = require('@hapi/joi');
 const compression = require('compression');
-const mysql = require('mysql');
 const express = require('express');
 const helmet = require('helmet');
+const mysql = require('mysql');
 
 var app = express();
 app.use(express.json());
@@ -11,57 +11,42 @@ app.use(compression());
 
 const port = process.env.PORT || 3000;
 
+var pool = mysql.createPool({
+    connectionLimit: 5, 
+    host: 'sql.server153484.nazwa.pl',
+    user: 'server153484_foodcheckapi',
+    password: 'WW7aysAYy5X3ipD',
+    database: 'server153484_foodCheck'
+})
+
 // GET for all products
 app.get('/api/products', function(req, res){
-    // every GET or POST needs its own var connection due to errors caused by disconnecting server
-    const connection = mysql.createConnection({
-        host: '',
-        user: '',
-        password: '',
-        database: ''
-    });
-    // connects to database and query
-    if(connection.connect())
-        console.log('Connected with database');
-    connection.query('SELECT * FROM food_products', function (error, results, fields) {
+    
+    // includes pool.getConnection(), connection.query() & connection.release()
+    pool.query('SELECT * FROM food_products', function (error, results, fields) {
         if (error) throw error;
         console.log('GET request for all products');
         if(results.length===0) res.status(404).send('No products in database');
         res.send(JSON.stringify(results));
     });
-    // ends the connection
-    if(connection.end())
-        console.log('Disconnected from database');
 });
 
 // GET for product with passed barcode
 app.get('/api/products/:barcode', function(req, res){
-    const connection = mysql.createConnection({
-        host: '',
-        user: '',
-        password: '',
-        database: ''
+    
+    pool.query('SELECT * FROM food_products WHERE barcode = ?;', 
+        [req.params.barcode], 
+        function (error, results, fields) {
+            if (error) throw error;
+            console.log('GET command for ' + req.params.barcode);
+            if(results.length===0) res.status(404).send('Product not found');
+            else res.send(JSON.stringify(results));
     });
-    if(connection.connect())
-        console.log('Connected with database');
-    connection.query('SELECT * FROM food_products WHERE barcode = '+req.params.barcode+';', function (error, results, fields) {
-        if (error) throw error;
-        console.log('GET command for ' + req.params.barcode);
-        if(results.length===0) res.status(404).send('Product not found');
-        else res.send(JSON.stringify(results));
-    });
-    if(connection.end())
-        console.log('Disconnected from database');
 });
 
 // POST product to database
 app.post('/api/products', function(req, res){
-    const connection = mysql.createConnection({
-        host: '',
-        user: '',
-        password: '',
-        database: ''
-    });
+    
     //Validation logic
     const schema = Joi.object({
         barcode: Joi.number().required(),
@@ -86,14 +71,14 @@ app.post('/api/products', function(req, res){
         return;
     }
 
-    var image_url = "http://foltys.net/food-check/img/"+req.body.barcode;
-    const sqlCommand = "INSERT INTO `food_products` (`id`, `barcode`, `name`, `weight`, `energy`, `fat`, `saturates`, `carbohydrates`, `sugars`, `fibre`, `protein`, `salt`, `imURL`) VALUES (NULL, '"+req.body.barcode+"', '"+req.body.name+"', '"+req.body.weight+"', '"+req.body.energy+"', '"+req.body.fat+"', '"+req.body.saturates+"', '"+req.body.carbohydrates+"', '"+req.body.sugars+"', "+req.body.fibre+", '"+req.body.protein+"', '"+req.body.salt+"', '"+image_url+"');";
+    var image_url = "http://foltys.net/food-check/img/"+req.body.barcode+".jpg";
        
-    connection.query(sqlCommand, function (error, results, fields) {
-        if (error) throw error;
-        console.log('POST command for ' + req.body.barcode);
-        
-        res.send(JSON.stringify(req.body.barcode));
+    pool.query("INSERT INTO `food_products` (`id`, `barcode`, `name`, `weight`, `energy`, `fat`, `saturates`, `carbohydrates`, `sugars`, `fibre`, `protein`, `salt`, `imURL`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", 
+    [req.body.barcode, req.body.name, req.body.weight, req.body.energy, req.body.fat, req.body.saturates, req.body.carbohydrates, req.body.sugars, req.body.fibre, req.body.protein, req.body.salt, image_url],
+        function (error, results, fields) {
+            if (error) throw error;
+            console.log('POST command for ' + req.body.barcode);       
+            res.status(201).send(JSON.stringify(req.body.barcode));
     });
 });
 
